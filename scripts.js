@@ -5,6 +5,16 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "gmail",
+        "snippet": "une boite mail par google",
+        "link": "mail.google.com"
+    },
+    {
+        "title": "ROBLOX",
+        "snippet": "jeu qui est bien mais sa commu fais que tout le monde déteste ce jeu(mais le jeu est bien)",
+        "link": "roblox.com"
+    },
+    {
         "title": "kour",
         "snippet": "je de tir en ligne avec plusieurs mode de jeu",
         "link": "https://kour.io"
