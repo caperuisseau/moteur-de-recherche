@@ -7,17 +7,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <img src="logo.png" alt="Logo">
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="logo.png" alt="Logo du moteur de recherche">
+            </div>
         </div>
+    </header>
+    <main class="container">
         <form class="search-form" onsubmit="return search(event)">
-            <input type="text" id="query" name="q" placeholder="Recherche" aria-label="Search" required>
+            <label for="query" class="visually-hidden">Recherche</label>
+            <input type="text" id="query" name="q" placeholder="Recherche" aria-label="Recherche" required>
             <button type="submit">Recherche</button>
         </form>
-        <div id="results"></div>
-        <div id="loading" style="display: none;">Loading...</div>
-    </div>
+        <div id="results" class="results"></div>
+        <div id="loading" class="loading" style="display: none;">Chargement...</div>
+    </main>
     <script src="scripts.js"></script>
 </body>
 </html>
