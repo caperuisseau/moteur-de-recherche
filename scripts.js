@@ -7,7 +7,7 @@ const searchResults = [
     {
         "title": "larousse",
         "snippet": "un dictionnaire de mots français",
-        "link": "Larousse.fr"
+        "link": "https://Larousse.fr"
     },
     {
         "title": "gmail",
