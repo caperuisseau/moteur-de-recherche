@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "netlify",
+        "snippet": "netlify un hébergeur de site web gratuit github",
+        "link": "https://www.netlify.com"
+    },
+    {
         "title": "Tutoriel HTML",
         "snippet": "HTML est le langage standard pour créer des pages Web.",
         "link": "https://www.w3schools.com/html/"
