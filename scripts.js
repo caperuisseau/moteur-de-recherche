@@ -7,14 +7,13 @@ const searchResults = [
     {
         "title": "opera",
         "snippet": "un autre moteur de recherche mais n'y allez pas celui là est meilleur",
-        "link": "opera.com"
+        "link": "https://opera.com"
     },
     {
         "title": "yahoo",
         "snippet": "un autre moteur de recherche mais n'y aller pas car celui là est meilleur",
-        "link": "yahoo.com"
+        "link": "https://yahoo.com"
     },
-
     {
         "title": "netflix",
         "snippet": "une app de streaming vidéo",
@@ -22,18 +21,18 @@ const searchResults = [
     },
     {
         "title": "google",
-        "snippet: "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
+        "snippet": "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
         "link": "https://www.google.com"
     },
     {
         "title": "bing",
-        "snippet: "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
+        "snippet": "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
         "link": "https://www.bing.com"
     },
     {
         "title": "bitsy",
         "snippet": "une plateforme de création de jeu en html",
-        "link": "bitsy.org"
+        "link": "https://bitsy.org"
     },
     {
         "title": "netlify",
@@ -71,8 +70,8 @@ const searchResults = [
         "link": "https://www.oracle.com/java/technologies/javase-downloads.html"
     },
     {
-        "title": "notpad++",
-        "snippet": "notpad est un IDLE pour tout language de code possible",
+        "title": "notepad++",
+        "snippet": "notepad est un IDLE pour tout language de code possible",
         "link": "https://notepad-plus-plus.org"
     },
     {
@@ -113,7 +112,7 @@ const searchResults = [
     {
         "title": "ChatGPT",
         "snippet": "une IA machine learning crée par openAI",
-        "link": "https://chatgp.com"
+        "link": "https://chat.openai.com"
     },
     {
         "title": "openai",
@@ -171,7 +170,10 @@ function search(event) {
     loading.style.display = 'block';
 
     setTimeout(() => {
-        const results = searchResults.filter(result => result.title.toLowerCase().includes(query) || result.snippet.toLowerCase().includes(query));
+        const results = searchResults.filter(result => 
+            result.title.toLowerCase().includes(query) || 
+            result.snippet.toLowerCase().includes(query)
+        );
         loading.style.display = 'none';
 
         if (results.length > 0) {
