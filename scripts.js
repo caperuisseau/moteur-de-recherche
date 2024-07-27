@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "netflix",
+        "snippet": "une app de streaming vidéo",
+        "link": "https://www.netflix.com"
+    },
+    {
         "title": "netlify",
         "snippet": "netlify un hébergeur de site web gratuit github",
         "link": "https://www.netlify.com"
