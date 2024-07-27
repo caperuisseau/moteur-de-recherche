@@ -10,6 +10,21 @@ const searchResults = [
         "link": "https://www.netflix.com"
     },
     {
+        "title": "google",
+        "snippet: "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
+        "link": "https://www.google.com"
+    },
+    {
+        "title": "bing",
+        "snippet: "un autre moteur de recherche mais n'y allez pas car celui là est meilleur",
+        "link": "https://www.bing.com"
+    },
+    {
+        "title": "bitsy",
+        "snippet": "une plateforme de création de jeu en html",
+        "link": "bitsy.org"
+    },
+    {
         "title": "netlify",
         "snippet": "netlify un hébergeur de site web gratuit github",
         "link": "https://www.netlify.com"
