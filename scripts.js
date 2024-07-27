@@ -5,6 +5,17 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "opera",
+        "snippet": "un autre moteur de recherche mais n'y allez pas celui là est meilleur",
+        "link": "opera.com"
+    },
+    {
+        "title": "yahoo",
+        "snippet": "un autre moteur de recherche mais n'y aller pas car celui là est meilleur",
+        "link": "yahoo.com"
+    },
+
+    {
         "title": "netflix",
         "snippet": "une app de streaming vidéo",
         "link": "https://www.netflix.com"
