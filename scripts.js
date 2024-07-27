@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "kour",
+        "snippet": "je de tir en ligne avec plusieurs mode de jeu",
+        "link": "https://kour.io"
+    },
+    {
         "title": "opera",
         "snippet": "un autre moteur de recherche mais n'y allez pas celui là est meilleur",
         "link": "https://opera.com"
