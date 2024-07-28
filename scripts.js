@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "wikipédia",
+        "snippet": "c'est the wiki,
+        "link": "wikipedia.org"
+    },
+    {
         "title": "larousse",
         "snippet": "un dictionnaire de mots français",
         "link": "https://Larousse.fr"
