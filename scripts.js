@@ -6,7 +6,7 @@ const searchResults = [
     },
     {
         "title": "wikipédia",
-        "snippet": "c'est the wiki,
+        "snippet": "c'est the wiki",
         "link": "wikipedia.org"
     },
     {
