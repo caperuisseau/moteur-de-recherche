@@ -27,7 +27,7 @@ const searchResults = [
     {
         "title": "ROBLOX",
         "snippet": "jeu qui est bien mais sa commu fais que tout le monde déteste ce jeu(mais le jeu est bien)",
-        "link": "roblox.com"
+        "link": "https://roblox.com"
     },
     {
         "title": "kour",
