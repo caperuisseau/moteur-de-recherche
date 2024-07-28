@@ -7,12 +7,12 @@ const searchResults = [
     {
         "title": "wikihow",
         "snippet": "un wiki pour savoir comment faire (utile)",
-        "link": "wikihow.com"
+        "link": "https://wikihow.com"
     },
     {
         "title": "wikipédia",
         "snippet": "c'est the wiki",
-        "link": "wikipedia.org"
+        "link": "https://wikipedia.org"
     },
     {
         "title": "larousse",
