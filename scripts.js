@@ -10,6 +10,21 @@ const searchResults = [
         "link": "https://wikihow.com"
     },
     {
+        "title": "france wikipedia",
+        "snippet": "la page wikipedia de la france",
+        "link": "https://wikipedia.org/wiki/France"
+    },
+    {
+        "title": "paris wikipedia",
+        "snippet": "le wikipedia de paris",
+        "link": "https://wikipedia.org/wiki/Paris"
+    },
+    {
+        "title": "marseille wikipedia",
+        "snippet": "le wikipedia de marseille",
+        "link": "https://wikipedia.org/wiki/Marseille"
+    },
+    {
         "title": "wikipédia",
         "snippet": "c'est the wiki",
         "link": "https://wikipedia.org"
