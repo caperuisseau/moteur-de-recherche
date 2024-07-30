@@ -5,6 +5,16 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "krea ai",
+        "snippet": "une ia qui génère des vidéo des photo caché et des photo",
+        "link": "https://krea.ai"
+    },
+    {
+        "title": "aternos",
+        "snippet": "un hébergeur de serveur minecraft gratuit pour toujours",
+        "link": "https://aternos.org"
+    },
+    {
         "title": "wikihow",
         "snippet": "un wiki pour savoir comment faire (utile)",
         "link": "https://wikihow.com"
