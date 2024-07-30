@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "Renault megane rs",
+        "snippet": " une putain de voiture demander par un con",
+        "link": "https://www.renault.fr/vehicules-gammes-precedentes/megane-rs-ultime.html"
+    },
+    {
         "title": "krea ai",
         "snippet": "une ia qui génère des vidéo des photo caché et des photo",
         "link": "https://krea.ai"
