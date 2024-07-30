@@ -47,7 +47,7 @@ const searchResults = [
     {
         "title": "gmail",
         "snippet": "une boite mail par google",
-        "link": "mail.google.com"
+        "link": "https://mail.google.com"
     },
     {
         "title": "ROBLOX",
