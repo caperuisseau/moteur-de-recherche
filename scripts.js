@@ -9,6 +9,11 @@ const searchResults = [
         "snippet": " une putain de voiture demander par un con",
         "link": "https://www.renault.fr/vehicules-gammes-precedentes/megane-rs-ultime.html"
     },
+    { 
+        "title":" "minecrafttools",
+        "snippet": "des choses utile a faire sur minecraft",
+        "link": "https://minecraft.tools"
+    },
     {
         "title": "krea ai",
         "snippet": "une ia qui génère des vidéo des photo caché et des photo",
