@@ -10,7 +10,7 @@ const searchResults = [
         "link": "https://www.renault.fr/vehicules-gammes-precedentes/megane-rs-ultime.html"
     },
     { 
-        "title":" "minecrafttools",
+        "title": "minecrafttools",
         "snippet": "des choses utile a faire sur minecraft",
         "link": "https://minecraft.tools"
     },
