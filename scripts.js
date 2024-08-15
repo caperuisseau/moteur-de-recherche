@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "newer browser v1 reload",
+        "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site",
+        "link": "browser/index.html"
+    },
+    {
         "title": "Renault megane rs",
         "snippet": " une putain de voiture demander par un con",
         "link": "https://www.renault.fr/vehicules-gammes-precedentes/megane-rs-ultime.html"
