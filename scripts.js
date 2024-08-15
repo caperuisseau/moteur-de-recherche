@@ -1,5 +1,5 @@
 const searchResults = [
-    { "title": "Apprendre le JavaScript", "snippet": "JavaScript est un langage de programmation utilisé pour créer des pages web interactives.", "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide" },
+     { "title": "Apprendre le JavaScript", "snippet": "JavaScript est un langage de programmation utilisé pour créer des pages web interactives.", "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide" },
     { "title": "newer paint", "snippet": "alors franchement il est beau et fait maison alors si vous aimez newer browser vous allez aimer newer paint", "link": "https://newer-browser.netlify.app/paint/index.html" },
     { "title": "newer texte", "snippet": "c'est beau c'est utile c'est bien fait c'est newer c'est cool!", "link": "https://newer-text.netlify.app/" },
     { "title": "newer browser v1 reload", "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site", "link": "https://newer-browser.netlify.app/browser/index.html" },
@@ -65,6 +65,10 @@ function search(event) {
             result.title.toLowerCase().includes(query) || 
             result.snippet.toLowerCase().includes(query)
         );
+
+        const endTime = performance.now(); // End time
+        const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
+
         loading.style.display = 'none';
 
         if (results.length > 0) {
@@ -81,8 +85,6 @@ function search(event) {
             resultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
         }
 
-        const endTime = performance.now(); // End time
-        const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
         timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
         timeTakenElement.style.display = 'block';
     }, 500);
