@@ -10,6 +10,11 @@ const searchResults = [
         "link": "https://newer-browser.netlify.app/paint/index.html"
     },
     {
+        "title": "newer texte",
+        "snippet": "c'est beau c'est utile c'est bien fait c'est newer c'est cool!",
+        "link": "https://newer-text.netlify.app/"
+    },
+    {
         "title": "newer browser v1 reload",
         "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site",
         "link": "https://newer-browser.netlify.app/browser/index.html"
