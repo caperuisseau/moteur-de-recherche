@@ -7,12 +7,12 @@ const searchResults = [
     {
         "title": "newer paint",
         "snippet": "alors franchement il est beau et fait maison alors si vous aimez newer browser vous allez aimer newer paint",
-        "link": "paint/index.html"
+        "link": "https://newer-browser.netlify.app/paint/index.html"
     },
     {
         "title": "newer browser v1 reload",
         "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site",
-        "link": "browser/index.html"
+        "link": "https://newer-browser.netlify.app/browser/index.html"
     },
     {
         "title": "Renault megane rs",
