@@ -5,6 +5,11 @@ const searchResults = [
         "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
     },
     {
+        "title": "newer paint",
+        "snippet": "alors franchement il est beau et fait maison alors si vous aimez newer browser vous allez aimer newer paint",
+        "link": "paint/index.html"
+    },
+    {
         "title": "newer browser v1 reload",
         "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site",
         "link": "browser/index.html"
