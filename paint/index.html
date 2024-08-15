@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint en HTML</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        #toolbar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+        }
+
+        input[type="color"], 
+        input[type="range"], 
+        select, 
+        input[type="checkbox"] {
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        #canvas {
+            border: 3px solid #333;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #back-button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #ff6b6b;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        #back-button:hover {
+            background-color: #ff4e4e;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Paint en HTML</h1>
+
+    <div id="toolbar">
+        <!-- Couleurs -->
+        <label for="color">Couleur :</label>
+        <input type="color" id="color" value="#000000">
+
+        <!-- Types de pinceaux -->
+        <label for="brush">Pinceau :</label>
+        <select id="brush">
+            <option value="round">Rond</option>
+            <option value="square">Carré</option>
+        </select>
+
+        <!-- Taille -->
+        <label for="size">Taille :</label>
+        <input type="range" id="size" min="1" max="50" value="5">
+
+        <!-- Gomme -->
+        <label for="eraser">Gomme :</label>
+        <input type="checkbox" id="eraser">
+    </div>
+
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <button id="back-button">Retour</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('color');
+        const sizeSlider = document.getElementById('size');
+        const brushType = document.getElementById('brush');
+        const eraserCheckbox = document.getElementById('eraser');
+        const backButton = document.getElementById('back-button');
+
+        let drawing = false;
+        let erasing = false;
+        let currentColor = colorPicker.value;
+        let currentSize = sizeSlider.value;
+        let currentBrush = brushType.value;
+
+        // Initialisation
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = currentSize;
+
+        // Fonction pour récupérer les coordonnées exactes de la souris sur le canevas
+        function getMousePosition(e) {
+            const rect = canvas.getBoundingClientRect(); // Obtient la position du canevas
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        // Fonction pour commencer le dessin
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            draw(e);
+        });
+
+        // Fonction pour arrêter le dessin
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            ctx.beginPath(); // Commencer un nouveau chemin
+        });
+
+        // Fonction pour dessiner
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if (!drawing) return;
+
+            ctx.lineWidth = currentSize;
+            ctx.strokeStyle = currentColor;
+            ctx.lineCap = currentBrush;
+
+            const { x, y } = getMousePosition(e);
+
+            if (erasing) {
+                ctx.globalCompositeOperation = 'destination-out'; // Efface au lieu de dessiner
+            } else {
+                ctx.globalCompositeOperation = 'source-over'; // Dessin normal
+            }
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        // Mise à jour des couleurs
+        colorPicker.addEventListener('input', (e) => {
+            currentColor = e.target.value;
+        });
+
+        // Mise à jour de la taille
+        sizeSlider.addEventListener('input', (e) => {
+            currentSize = e.target.value;
+        });
+
+        // Mise à jour du pinceau
+        brushType.addEventListener('change', (e) => {
+            currentBrush = e.target.value === 'square' ? 'butt' : 'round';
+        });
+
+        // Gestion de la gomme
+        eraserCheckbox.addEventListener('change', (e) => {
+            erasing = e.target.checked;
+        });
+
+        // Redirection vers le site en cliquant sur le bouton retour
+        backButton.addEventListener('click', () => {
+            window.location.href = "https://newer-browser.netlify.app";
+        });
+    </script>
+</body>
+
+</html>
