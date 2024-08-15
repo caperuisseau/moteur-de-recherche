@@ -1,5 +1,6 @@
 const searchResults = [
      { "title": "Apprendre le JavaScript", "snippet": "JavaScript est un langage de programmation utilisé pour créer des pages web interactives.", "link": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide" },
+     { "title": "newer screen recorder", "snippet": "il est beau bien fait c'est newer c'est nickel!", "link": "https://newer-site-recorder.netlify.app" },
     { "title": "newer paint", "snippet": "alors franchement il est beau et fait maison alors si vous aimez newer browser vous allez aimer newer paint", "link": "https://newer-browser.netlify.app/paint/index.html" },
     { "title": "newer texte", "snippet": "c'est beau c'est utile c'est bien fait c'est newer c'est cool!", "link": "https://newer-text.netlify.app/" },
     { "title": "newer browser v1 reload", "snippet": "j'ai remis la première versions pour la nostalgie mais il y a beaucoup moin de site", "link": "https://newer-browser.netlify.app/browser/index.html" },
