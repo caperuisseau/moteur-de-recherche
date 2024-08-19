@@ -45,7 +45,7 @@ const searchResults = [
     { "title": "Introduction à Docker", "snippet": "Docker est une plateforme ouverte pour développer, expédier et exécuter des applications.", "link": "https://docs.docker.com/get-started/" },
     { "title": "Node.js Guide", "snippet": "Node.js est un environnement d'exécution JavaScript côté serveur.", "link": "https://nodejs.org/en/docs/" },
     { "title": "Tutoriel Vue.js", "snippet": "Vue.js est un framework JavaScript progressif utilisé pour construire des interfaces utilisateur.", "link": "https://vuejs.org/v2/guide/" },
-    { "title": "squeezie youtube", "snippet": " le youtubeur le plus connu de france avec 18,9 millions d'abonnés", "link": "https://www.youtube.com/user/aMOODIEsqueezie" },
+    { "title": "squeezie youtube", "snippet": " le youtubeur le plus connu de france avec 19 millions d'abonnés 👏", "link": "https://www.youtube.com/user/aMOODIEsqueezie" },
     { "title": "pipi", "snippet": "vous êtes pas mature.", "link": "https://www.instantspresents.com/15-conseils-pour-etre-plus-mature-et-responsable/#:~:text=15%20conseils%20pour%20%C3%AAtre%20plus%20mature%20et%20responsable,...%208%20Soyez%20ouvert%20d%E2%80%99esprit%20plus%20souvent.%20" },
     { "title": "historique de Epic Games", "snippet": "historique de epic games", "link": "https://en.wikipedia.org/wiki/Epic_Games" }
 ];
