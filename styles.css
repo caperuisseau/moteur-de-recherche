@@ -68,30 +68,6 @@ body {
     background-color: #357ae8;
 }
 
-/* Suggestions */
-.suggestions-container {
-    position: absolute;
-    top: 60px;
-    left: 10%;
-    width: 80%;
-    background-color: white;
-    border: 1px solid #dfe1e5;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    max-height: 200px; /* Limite la hauteur pour éviter que les suggestions ne soient trop longues */
-    overflow-y: auto; /* Permet le défilement si trop de suggestions */
-}
-
-.suggestion {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.suggestion:hover {
-    background-color: #f1f1f1;
-}
-
 /* Résultats de recherche */
 #results {
     margin-top: 20px;
@@ -122,30 +98,4 @@ body {
     margin-top: 20px;
     font-size: 18px;
     color: #4285f4;
-}
-
-/* Pagination */
-#pagination {
-    margin-top: 20px;
-    text-align: center;
-}
-
-#pagination button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#pagination button:hover {
-    background-color: #357ae8;
-}
-
-#pagination button:disabled {
-    background-color: #dfe1e5;
-    cursor: not-allowed;
 }
