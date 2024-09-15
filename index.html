@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moteur de Recherche</title>
     <link rel="stylesheet" href="styles.css">
-    <meta name="description" content="recherchez des sites web sur se super moteur de recherche codé par un codeur undépendant!">
+    <meta name="description" content="Recherchez des sites web avec ce moteur de recherche avancé codé par un développeur indépendant !">
     <meta name="robots" content="index, follow">
 </head>
 
@@ -14,16 +14,16 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <script>
         (adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_client: "ca-pub-XXXXXXXXXXXXXXXX", // Remplacez par votre ID AdSense
-          enable_page_level_ads: true
+            google_ad_client: "ca-pub-XXXXXXXXXXXXXXXX", // Remplacez par votre ID AdSense
+            enable_page_level_ads: true
         });
     </script>
     <div class="container">
         <!-- Navigation bar with buttons -->
         <nav class="nav-buttons">
-            <button onclick="window.location.href='https://newer-stream.netlify.app/';">Newer stream</button>
-            <button onclick="window.location.href='https://newer-play-games.netlify.app';">newer play games</button>
-            <button onclick="window.location.href='https://newer-hub.netlify.app';">newer hub</button>
+            <button onclick="window.location.href='https://newer-stream.netlify.app/';">Newer Stream</button>
+            <button onclick="window.location.href='https://newer-play-games.netlify.app';">Newer Play Games</button>
+            <button onclick="window.location.href='https://newer-hub.netlify.app';">Newer Hub</button>
         </nav>
 
         <div class="logo">
@@ -38,12 +38,18 @@
             <button type="submit">Recherche</button>
         </form>
 
+        <div id="suggestions" class="suggestions-container"></div>
         <div id="results"></div>
         <div id="loading" style="display: none;">Loading...</div>
         <p id="timeTaken" style="display: none;"></p> <!-- Element to show the time taken -->
+
+        <div id="pagination">
+            <button id="prevPage" onclick="changePage(-1)">Précédent</button>
+            <button id="nextPage" onclick="changePage(1)">Suivant</button>
+        </div>
     </div>
 
-    <script src="scripts.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>
