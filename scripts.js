@@ -4,6 +4,7 @@ function search(event) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
+    
     resultsContainer.innerHTML = '';
     loading.style.display = 'block';
 
@@ -39,6 +40,9 @@ function search(event) {
 
             timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
             timeTakenElement.style.display = 'block';
+
+            // Réinitialiser le champ de recherche
+            document.getElementById('query').value = '';
         })
         .catch(error => {
             console.error('Erreur lors du chargement des résultats :', error);
