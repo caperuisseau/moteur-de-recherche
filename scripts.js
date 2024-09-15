@@ -1,28 +1,40 @@
 function search(event) {
     event.preventDefault();
-    const query = document.getElementById('query').value.toLowerCase();
+    const query = document.getElementById('query').value.toLowerCase().trim();
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
     
     loading.style.display = 'block';
-
+    
     const startTime = performance.now(); // Start time
-
+    
     // Charger le fichier JSON
     fetch('sites.json')
         .then(response => response.json())
-        .then(data => {
-            const results = data.filter(result =>
-                result.title.toLowerCase().includes(query) ||
-                result.snippet.toLowerCase().includes(query)
+        .then(searchResults => {
+            // Fonction pour vérifier les correspondances
+            function match(text, query) {
+                const words = query.split(/\s+/); // Diviser le query en mots
+                return words.every(word => text.includes(word));
+            }
+            
+            const results = searchResults.filter(result =>
+                match(result.title.toLowerCase(), query) ||
+                match(result.snippet.toLowerCase(), query)
             );
+
+            // Tri des résultats par pertinence
+            results.sort((a, b) => {
+                return (b.title.toLowerCase().includes(query) ? 1 : 0) - (a.title.toLowerCase().includes(query) ? 1 : 0) ||
+                    (b.snippet.toLowerCase().includes(query) ? 1 : 0) - (a.snippet.toLowerCase().includes(query) ? 1 : 0);
+            });
 
             const endTime = performance.now(); // End time
             const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
-
+            
             loading.style.display = 'none';
-
+            
             if (results.length > 0) {
                 resultsContainer.innerHTML = ''; // Clear previous results
                 results.forEach(result => {
@@ -37,7 +49,7 @@ function search(event) {
             } else {
                 resultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
             }
-
+            
             timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
             timeTakenElement.style.display = 'block';
         })
