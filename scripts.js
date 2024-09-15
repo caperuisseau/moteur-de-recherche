@@ -5,7 +5,6 @@ function search(event) {
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
     
-    resultsContainer.innerHTML = '';
     loading.style.display = 'block';
 
     const startTime = performance.now(); // Start time
@@ -25,6 +24,7 @@ function search(event) {
             loading.style.display = 'none';
 
             if (results.length > 0) {
+                resultsContainer.innerHTML = ''; // Clear previous results
                 results.forEach(result => {
                     const resultElement = document.createElement('div');
                     resultElement.classList.add('result');
@@ -40,9 +40,6 @@ function search(event) {
 
             timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
             timeTakenElement.style.display = 'block';
-
-            // Réinitialiser le champ de recherche
-            document.getElementById('query').value = '';
         })
         .catch(error => {
             console.error('Erreur lors du chargement des résultats :', error);
