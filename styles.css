@@ -19,6 +19,39 @@ body {
 }
 
 .search-form {
+    position: sticky;
+    top: 0;
+    background-color: #0abdba; /* Couleur de fond identique à celle de la page */
+    padding: 10px;
+    z-index: 1000; /* La rendre visible au-dessus des autres éléments */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optionnel : un peu d'ombre pour l'effet visuel */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #0abdba;
+    min-height: 100vh; /* S'assure que le body peut défiler */
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    padding: 20px; /* Espace autour du contenu */
+}
+
+#results {
+    margin-top: 20px;
+    text-align: left;
+    width: 80%;
+    max-width: 800px; /* Limite la largeur des résultats */
+    overflow-y: auto; /* Permet le défilement si trop de résultats */
+}
+
+
+.search-form {
     margin-top: 20px;
 }
 
