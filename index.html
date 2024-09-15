@@ -9,12 +9,19 @@
 </head>
 
 <body>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+          google_ad_client: "ca-pub-XXXXXXXXXXXXXXXX", // Remplacez par votre ID AdSense
+          enable_page_level_ads: true
+        });
+    </script>
     <div class="container">
         <!-- Navigation bar with buttons -->
         <nav class="nav-buttons">
-            <button onclick="window.location.href='https://newer-stream.netlify.app/';">Newer Stream</button>
-            <button onclick="window.location.href='https://newer-play-games.netlify.app';">Newer Play Games</button>
-            <button onclick="window.location.href='https://newer-hub.netlify.app';">Newer Hub</button>
+            <button onclick="window.location.href='https://newer-stream.netlify.app/';">Newer stream</button>
+            <button onclick="window.location.href='https://newer-play-games.netlify.app';">newer play games</button>
+            <button onclick="window.location.href='https://newer-hub.netlify.app';">newer hub</button>
         </nav>
 
         <div class="logo">
@@ -29,15 +36,9 @@
             <button type="submit">Recherche</button>
         </form>
 
-        <div id="suggestions" class="suggestions-container"></div>
         <div id="results"></div>
         <div id="loading" style="display: none;">Loading...</div>
-        <p id="timeTaken" style="display: none;"></p>
-
-        <div id="pagination">
-            <button id="prevPage" onclick="changePage(-1)">Précédent</button>
-            <button id="nextPage" onclick="changePage(1)">Suivant</button>
-        </div>
+        <p id="timeTaken" style="display: none;"></p> <!-- Element to show the time taken -->
     </div>
 
     <script src="script.js"></script>
