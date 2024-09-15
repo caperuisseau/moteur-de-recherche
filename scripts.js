@@ -22,13 +22,6 @@ function calculateScore(result, query) {
     return score;
 }
 
-// Fonction pour vérifier les correspondances
-function match(text, query) {
-    const normalizedText = normalizeText(text);
-    const normalizedQuery = normalizeText(query);
-    return normalizedText.includes(normalizedQuery);
-}
-
 // Fonction pour mettre en surbrillance les résultats
 function highlightText(text, query) {
     const regex = new RegExp(`(${query})`, 'gi');
@@ -46,7 +39,7 @@ function updateSuggestions(query) {
             .then(data => {
                 const suggestions = data
                     .map(site => site.title)
-                    .filter(title => title.toLowerCase().startsWith(query.toLowerCase()));
+                    .filter(title => normalizeText(title).startsWith(normalizeText(query)));
 
                 suggestions.forEach(suggestion => {
                     const suggestionElement = document.createElement('div');
@@ -54,7 +47,8 @@ function updateSuggestions(query) {
                     suggestionElement.textContent = suggestion;
                     suggestionElement.onclick = () => {
                         document.getElementById('query').value = suggestion;
-                        search(new Event('submit')); // Trigger search with the selected suggestion
+                        suggestionsContainer.innerHTML = '';
+                        search(event);
                     };
                     suggestionsContainer.appendChild(suggestionElement);
                 });
@@ -62,40 +56,34 @@ function updateSuggestions(query) {
     }
 }
 
-// Fonction pour gérer les changements de page
-function changePage(direction) {
-    currentPage += direction;
-    search(new Event('submit')); // Rechercher de nouveau avec la page mise à jour
-}
-
-// Fonction principale de recherche
+// Fonction de recherche
 function search(event) {
     event.preventDefault();
-    const query = document.getElementById('query').value.toLowerCase().trim();
+    const query = document.getElementById('query').value.toLowerCase();
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
-
+    
     loading.style.display = 'block';
 
     const startTime = performance.now(); // Start time
 
+    // Charger le fichier JSON
     fetch('sites.json')
         .then(response => response.json())
-        .then(searchResults => {
-            // Filtrer et noter les résultats
-            const results = searchResults.map(result => ({
-                ...result,
-                score: calculateScore(result, query)
-            })).filter(result => result.score > 0);
+        .then(data => {
+            const results = data
+                .map(result => ({
+                    ...result,
+                    score: calculateScore(result, query)
+                }))
+                .filter(result => result.score > 0) // Only include results with a score
+                .sort((a, b) => b.score - a.score); // Sort by score
 
-            // Trier les résultats par score
-            results.sort((a, b) => b.score - a.score);
-
-            // Pagination
+            // Paginer les résultats
             const totalResults = results.length;
-            const totalPages = Math.ceil(totalResults / resultsPerPage);
-            const paginatedResults = results.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage);
+            const startIndex = (currentPage - 1) * resultsPerPage;
+            const paginatedResults = results.slice(startIndex, startIndex + resultsPerPage);
 
             const endTime = performance.now(); // End time
             const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
@@ -103,7 +91,7 @@ function search(event) {
             loading.style.display = 'none';
 
             if (paginatedResults.length > 0) {
-                resultsContainer.innerHTML = '';
+                resultsContainer.innerHTML = ''; // Clear previous results
                 paginatedResults.forEach(result => {
                     const resultElement = document.createElement('div');
                     resultElement.classList.add('result');
@@ -113,16 +101,16 @@ function search(event) {
                     `;
                     resultsContainer.appendChild(resultElement);
                 });
-
-                // Mettre à jour les boutons de pagination
-                document.getElementById('prevPage').style.display = (currentPage > 1) ? 'inline' : 'none';
-                document.getElementById('nextPage').style.display = (currentPage < totalPages) ? 'inline' : 'none';
             } else {
                 resultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
             }
 
             timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
             timeTakenElement.style.display = 'block';
+
+            // Mettre à jour la pagination
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage * resultsPerPage >= totalResults;
         })
         .catch(error => {
             console.error('Erreur lors du chargement des résultats :', error);
@@ -131,7 +119,13 @@ function search(event) {
         });
 }
 
-// Appelle updateSuggestions à chaque frappe dans le champ de recherche
-document.getElementById('query').addEventListener('input', function() {
-    updateSuggestions(this.value);
+// Fonction pour changer de page
+function changePage(direction) {
+    currentPage += direction;
+    search(event);
+}
+
+// Écouter les entrées de recherche pour mettre à jour les suggestions
+document.getElementById('query').addEventListener('input', (event) => {
+    updateSuggestions(event.target.value);
 });
