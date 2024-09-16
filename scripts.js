@@ -9,32 +9,40 @@ function search(event) {
     
     const startTime = performance.now(); // Start time
     
-    // Charger le fichier JSON
     fetch('sites.json')
         .then(response => response.json())
         .then(searchResults => {
-            // Fonction pour vérifier les correspondances
-            function match(text, query) {
-                const words = query.split(/\s+/); // Diviser le query en mots
-                return words.every(word => text.includes(word));
+            // Diviser la requête en mots
+            const queryWords = query.split(/\s+/);
+
+            // Calculer TF-IDF pour chaque document
+            const allSnippets = searchResults.map(result => result.snippet.toLowerCase());
+
+            function calculateTFIDFScore(result) {
+                let score = 0;
+                queryWords.forEach(word => {
+                    score += calculateTFIDF(word, result.snippet.toLowerCase(), allSnippets);
+                    score += calculateTFIDF(word, result.title.toLowerCase(), allSnippets) * 2; // Priorité pour le titre
+                });
+                return score;
             }
-            
-            const results = searchResults.filter(result =>
-                match(result.title.toLowerCase(), query) ||
-                match(result.snippet.toLowerCase(), query)
-            );
 
-            // Tri des résultats par pertinence
-            results.sort((a, b) => {
-                return (b.title.toLowerCase().includes(query) ? 1 : 0) - (a.title.toLowerCase().includes(query) ? 1 : 0) ||
-                    (b.snippet.toLowerCase().includes(query) ? 1 : 0) - (a.snippet.toLowerCase().includes(query) ? 1 : 0);
-            });
+            // Ajouter la popularité (comme le nombre de vues) pour ajuster le classement
+            function calculatePowerRank(result) {
+                const tfidfScore = calculateTFIDFScore(result);
+                const popularityScore = result.views || 0;
+                return tfidfScore * 0.7 + popularityScore * 0.3;
+            }
 
-            const endTime = performance.now(); // End time
-            const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
-            
+            // Filtrer et trier les résultats
+            const results = searchResults.filter(result => calculateTFIDFScore(result) > 0);
+            results.sort((a, b) => calculatePowerRank(b) - calculatePowerRank(a));
+
+            const endTime = performance.now();
+            const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+
             loading.style.display = 'none';
-            
+
             if (results.length > 0) {
                 resultsContainer.innerHTML = ''; // Clear previous results
                 results.forEach(result => {
@@ -43,13 +51,14 @@ function search(event) {
                     resultElement.innerHTML = `
                         <a href="${result.link}" target="_blank">${result.title}</a>
                         <p>${result.snippet}</p>
+                        <p><strong>Popularité :</strong> ${result.views || 0} vues</p>
                     `;
                     resultsContainer.appendChild(resultElement);
                 });
             } else {
                 resultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
             }
-            
+
             timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
             timeTakenElement.style.display = 'block';
         })
