@@ -3,14 +3,19 @@ let invertedIndex = {}; // Inverted index for faster lookup
 let documentVectors = {}; // Stores precomputed TF-IDF vectors for each document
 let totalDocuments = 0; // To store the total number of documents
 
-// Fonction pour gérer la recherche
+// Wait for the DOM to fully load before attaching event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('searchForm').addEventListener('submit', search);
+});
+
+// Function to handle search
 function search(event) {
     event.preventDefault();
     const query = document.getElementById('query').value.toLowerCase().trim();
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
-    
+
     if (!query || query.length < 2) {
         resultsContainer.innerHTML = '<p>Veuillez entrer un terme de recherche plus précis.</p>';
         return; // Si la requête est vide ou trop courte, on ne fait rien
@@ -20,11 +25,11 @@ function search(event) {
     resultsContainer.innerHTML = ''; // Vide les résultats précédents
     const startTime = performance.now(); // Temps de début
 
-    // Si les résultats sont déjà mis en cache, on les utilise
+    // If cached results are available, use them
     if (cachedSearchResults) {
         displayResultsWithCosineSimilarity(query, startTime);
     } else {
-        // Charger le fichier JSON
+        // Load the JSON file
         fetch('sites.json')
             .then(response => {
                 if (!response.ok) {
@@ -33,9 +38,9 @@ function search(event) {
                 return response.json();
             })
             .then(searchResults => {
-                cachedSearchResults = searchResults; // Mise en cache
+                cachedSearchResults = searchResults; // Cache the results
                 totalDocuments = searchResults.length;
-                createInvertedIndexAndPrecomputeTfIdf(searchResults); // Pré-calcul des TF-IDF
+                createInvertedIndexAndPrecomputeTfIdf(searchResults); // Precompute TF-IDF
                 displayResultsWithCosineSimilarity(query, startTime);
             })
             .catch(error => {
@@ -46,15 +51,16 @@ function search(event) {
     }
 }
 
-// Fonction pour créer l'index inversé et pré-calculer TF-IDF pour chaque document
+// Function to create the inverted index and precompute TF-IDF for each document
 function createInvertedIndexAndPrecomputeTfIdf(documents) {
-    documentVectors = {}; // Réinitialiser les vecteurs de documents
-    invertedIndex = {}; // Réinitialiser l'index inversé
+    documentVectors = {}; // Reset document vectors
+    invertedIndex = {}; // Reset inverted index
 
-    // Calcul de TF-IDF pour chaque document et construction de l'index inversé
+    // Calculate TF-IDF for each document and build the inverted index
     documents.forEach((doc, docIndex) => {
         const words = [...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)];
         const wordCount = {};
+
         words.forEach(word => {
             if (!wordCount[word]) {
                 wordCount[word] = 0;
@@ -62,7 +68,7 @@ function createInvertedIndexAndPrecomputeTfIdf(documents) {
             wordCount[word] += 1;
         });
 
-        // Créer le vecteur TF-IDF pour ce document
+        // Create the TF-IDF vector for this document
         const tfIdfVector = {};
         Object.keys(wordCount).forEach(word => {
             const tf = wordCount[word] / words.length;
@@ -71,7 +77,7 @@ function createInvertedIndexAndPrecomputeTfIdf(documents) {
 
             tfIdfVector[word] = tfIdf;
 
-            // Ajouter à l'index inversé
+            // Add to inverted index
             if (!invertedIndex[word]) {
                 invertedIndex[word] = {
                     documents: [],
@@ -81,18 +87,18 @@ function createInvertedIndexAndPrecomputeTfIdf(documents) {
             invertedIndex[word].documents.push({ docIndex, tfIdf });
         });
 
-        // Stocker le vecteur TF-IDF
+        // Store the TF-IDF vector
         documentVectors[docIndex] = tfIdfVector;
     });
 
-    // Mise à jour de l'IDF dans l'index inversé
+    // Update IDF in the inverted index
     Object.keys(invertedIndex).forEach(word => {
         const docCount = invertedIndex[word].documents.length;
         invertedIndex[word].idf = Math.log(totalDocuments / docCount);
     });
 }
 
-// Fonction pour afficher les résultats avec la similarité cosinus
+// Function to display results with cosine similarity
 function displayResultsWithCosineSimilarity(query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
@@ -101,7 +107,7 @@ function displayResultsWithCosineSimilarity(query, startTime) {
     const queryWords = query.split(/\s+/);
     const queryVector = createQueryVector(queryWords);
 
-    // Calculer la similarité cosinus pour chaque document
+    // Calculate cosine similarity for each document
     const results = Object.keys(documentVectors).map(docIndex => {
         const docVector = documentVectors[docIndex];
         const cosineSim = calculateCosineSimilarity(queryVector, docVector);
@@ -109,18 +115,18 @@ function displayResultsWithCosineSimilarity(query, startTime) {
             ...cachedSearchResults[docIndex],
             score: cosineSim
         };
-    }).filter(result => result.score > 0); // Garder les résultats pertinents
+    }).filter(result => result.score > 0); // Keep relevant results
 
-    // Tri des résultats par score décroissant
+    // Sort results by descending score
     results.sort((a, b) => b.score - a.score);
 
-    const endTime = performance.now(); // Temps de fin
-    const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Temps en secondes
+    const endTime = performance.now(); // End time
+    const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // Time in seconds
 
-    loading.style.display = 'none'; // Cache le message de chargement
+    loading.style.display = 'none'; // Hide loading message
 
     if (results.length > 0) {
-        resultsContainer.innerHTML = ''; // Efface les résultats précédents
+        resultsContainer.innerHTML = ''; // Clear previous results
         results.forEach(result => {
             const resultElement = document.createElement('div');
             resultElement.classList.add('result');
@@ -138,7 +144,7 @@ function displayResultsWithCosineSimilarity(query, startTime) {
     timeTakenElement.style.display = 'block';
 }
 
-// Fonction pour créer un vecteur de requête TF-IDF
+// Function to create a query TF-IDF vector
 function createQueryVector(queryWords) {
     const queryVector = {};
     queryWords.forEach(word => {
@@ -148,7 +154,7 @@ function createQueryVector(queryWords) {
     return queryVector;
 }
 
-// Fonction pour calculer la similarité cosinus
+// Function to calculate cosine similarity
 function calculateCosineSimilarity(queryVector, docVector) {
     let dotProduct = 0;
     let queryMagnitude = 0;
@@ -170,11 +176,9 @@ function calculateCosineSimilarity(queryVector, docVector) {
     return dotProduct / (queryMagnitude * docMagnitude);
 }
 
-// Fonction pour surligner les termes de recherche dans les résultats
+// Function to highlight query terms in results
 function highlightQuery(text, query) {
     const words = query.split(/\s+/);
-    const regex = new RegExp(`(${words.join('|')})`, 'gi'); // Créer une regex avec les termes de recherche
-    return text.replace(regex, '<mark>$1</mark>'); // Surligner les termes correspondants
+    const regex = new RegExp(`(${words.join('|')})`, 'gi'); // Create a regex with query terms
+    return text.replace(regex, '<mark>$1</mark>'); // Highlight matching terms
 }
-
-document.getElementById('searchForm').addEventListener('submit', search);
