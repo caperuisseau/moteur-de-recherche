@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let cachedSearchResults = null;
 let invertedIndex = {};
+let totalDocuments = 0;
 
 // Search function
 function search(event) {
@@ -39,6 +40,7 @@ function search(event) {
             })
             .then(searchResults => {
                 cachedSearchResults = searchResults;
+                totalDocuments = searchResults.length;
                 createInvertedIndex(searchResults);
                 displayResults(query, startTime);
             })
@@ -50,7 +52,7 @@ function search(event) {
     }
 }
 
-// Create a simple inverted index
+// Create a very simple inverted index
 function createInvertedIndex(documents) {
     invertedIndex = {};
 
@@ -75,46 +77,21 @@ function displayResults(query, startTime) {
     const queryWords = query.split(/\s+/);
     const relevantDocs = {};
 
-    // Exact Phrase Matching (if a phrase is wrapped in quotes)
-    const exactPhraseMatch = query.match(/"(.*?)"/);
-    const phrase = exactPhraseMatch ? exactPhraseMatch[1].toLowerCase() : null;
-
-    // Boosting logic
     queryWords.forEach(word => {
         if (invertedIndex[word]) {
             invertedIndex[word].forEach(docIndex => {
                 if (!relevantDocs[docIndex]) {
-                    relevantDocs[docIndex] = { score: 0, titleBoost: false };
+                    relevantDocs[docIndex] = 0;
                 }
-                const doc = cachedSearchResults[docIndex];
-                if (doc.title.toLowerCase().includes(word)) {
-                    relevantDocs[docIndex].score += 2; // Boost title matches
-                    relevantDocs[docIndex].titleBoost = true;
-                } else if (doc.snippet.toLowerCase().includes(word)) {
-                    relevantDocs[docIndex].score += 1; // Standard snippet match
-                }
+                relevantDocs[docIndex] += 1; // Simple relevance score based on word matches
             });
         }
     });
 
-    // Exact phrase matching logic
-    if (phrase) {
-        cachedSearchResults.forEach((doc, docIndex) => {
-            if (doc.title.toLowerCase().includes(phrase) || doc.snippet.toLowerCase().includes(phrase)) {
-                if (!relevantDocs[docIndex]) {
-                    relevantDocs[docIndex] = { score: 0, titleBoost: false };
-                }
-                relevantDocs[docIndex].score += 3; // Higher weight for exact phrase match
-            }
-        });
-    }
-
-    // Sort results by score
     const results = Object.keys(relevantDocs)
         .map(docIndex => ({
             ...cachedSearchResults[docIndex],
-            score: relevantDocs[docIndex].score,
-            titleBoost: relevantDocs[docIndex].titleBoost
+            score: relevantDocs[docIndex]
         }))
         .sort((a, b) => b.score - a.score); // Sort by relevance score
 
@@ -128,13 +105,9 @@ function displayResults(query, startTime) {
         results.forEach(result => {
             const resultElement = document.createElement('div');
             resultElement.classList.add('result');
-            const highlightTitle = highlightQuery(result.title, query);
-            const highlightSnippet = highlightQuery(result.snippet, query);
-            const boostLabel = result.titleBoost ? `<span class="boost"> (Title Boosted)</span>` : '';
-
             resultElement.innerHTML = `
-                <a href="${result.link}" target="_blank">${highlightTitle}${boostLabel}</a>
-                <p>${highlightSnippet}</p>
+                <a href="${result.link}" target="_blank">${highlightQuery(result.title, query)}</a>
+                <p>${highlightQuery(result.snippet, query)}</p>
             `;
             resultsContainer.appendChild(resultElement);
         });
