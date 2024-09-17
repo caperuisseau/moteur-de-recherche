@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let cachedSearchResults = null;
 let invertedIndex = {};
-let totalDocuments = 0;
 
 // Search function
 function search(event) {
@@ -40,7 +39,6 @@ function search(event) {
             })
             .then(searchResults => {
                 cachedSearchResults = searchResults;
-                totalDocuments = searchResults.length;
                 createInvertedIndex(searchResults);
                 displayResults(query, startTime);
             })
@@ -52,7 +50,7 @@ function search(event) {
     }
 }
 
-// Create a very simple inverted index
+// Create a simple inverted index
 function createInvertedIndex(documents) {
     invertedIndex = {};
 
@@ -68,7 +66,7 @@ function createInvertedIndex(documents) {
     });
 }
 
-// Display results based on query matching with new features
+// Display results based on query matching
 function displayResults(query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
