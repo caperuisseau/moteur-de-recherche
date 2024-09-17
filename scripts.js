@@ -1,6 +1,7 @@
-// Caching the search results globally to avoid multiple fetch calls
 let cachedSearchResults = null;
-let documentFrequency = {}; // For storing document frequency for each term
+let invertedIndex = {}; // Inverted index for faster lookup
+let documentVectors = {}; // Stores precomputed TF-IDF vectors for each document
+let totalDocuments = 0; // To store the total number of documents
 
 // Fonction pour gérer la recherche
 function search(event) {
@@ -21,7 +22,7 @@ function search(event) {
 
     // Si les résultats sont déjà mis en cache, on les utilise
     if (cachedSearchResults) {
-        displayResultsWithTfIdf(cachedSearchResults, query, startTime);
+        displayResultsWithCosineSimilarity(query, startTime);
     } else {
         // Charger le fichier JSON
         fetch('sites.json')
@@ -33,8 +34,9 @@ function search(event) {
             })
             .then(searchResults => {
                 cachedSearchResults = searchResults; // Mise en cache
-                calculateDocumentFrequency(searchResults); // Calcul de DF pour chaque terme
-                displayResultsWithTfIdf(searchResults, query, startTime);
+                totalDocuments = searchResults.length;
+                createInvertedIndexAndPrecomputeTfIdf(searchResults); // Pré-calcul des TF-IDF
+                displayResultsWithCosineSimilarity(query, startTime);
             })
             .catch(error => {
                 console.error('Erreur lors du chargement des résultats :', error);
@@ -44,38 +46,15 @@ function search(event) {
     }
 }
 
-// Fonction pour calculer la fréquence des documents pour chaque terme
-function calculateDocumentFrequency(documents) {
-    documentFrequency = {}; // Réinitialiser les fréquences des documents
-    const totalDocuments = documents.length;
+// Fonction pour créer l'index inversé et pré-calculer TF-IDF pour chaque document
+function createInvertedIndexAndPrecomputeTfIdf(documents) {
+    documentVectors = {}; // Réinitialiser les vecteurs de documents
+    invertedIndex = {}; // Réinitialiser l'index inversé
 
-    documents.forEach(document => {
-        const words = new Set([...document.title.toLowerCase().split(/\s+/), ...document.snippet.toLowerCase().split(/\s+/)]);
-        words.forEach(word => {
-            if (!documentFrequency[word]) {
-                documentFrequency[word] = 0;
-            }
-            documentFrequency[word] += 1; // Comptage du nombre de documents contenant ce mot
-        });
-    });
-
-    // Calcul de l'IDF pour chaque terme
-    for (let word in documentFrequency) {
-        documentFrequency[word] = Math.log(totalDocuments / documentFrequency[word]);
-    }
-}
-
-// Fonction pour afficher les résultats avec TF-IDF
-function displayResultsWithTfIdf(searchResults, query, startTime) {
-    const resultsContainer = document.getElementById('results');
-    const loading = document.getElementById('loading');
-    const timeTakenElement = document.getElementById('timeTaken');
-
-    // Fonction pour calculer le score TF-IDF
-    function calculateTfIdf(text, query) {
-        const words = text.toLowerCase().split(/\s+/);
-        const wordCount = {}; // Fréquence des termes dans ce texte
-        const totalWords = words.length;
+    // Calcul de TF-IDF pour chaque document et construction de l'index inversé
+    documents.forEach((doc, docIndex) => {
+        const words = [...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)];
+        const wordCount = {};
         words.forEach(word => {
             if (!wordCount[word]) {
                 wordCount[word] = 0;
@@ -83,24 +62,52 @@ function displayResultsWithTfIdf(searchResults, query, startTime) {
             wordCount[word] += 1;
         });
 
-        // Calcul du score TF-IDF pour chaque terme de la requête
-        const queryWords = query.split(/\s+/);
-        let tfIdfScore = 0;
-        queryWords.forEach(queryWord => {
-            const tf = wordCount[queryWord] ? wordCount[queryWord] / totalWords : 0; // Term Frequency
-            const idf = documentFrequency[queryWord] || 0; // Inverse Document Frequency
-            tfIdfScore += tf * idf; // TF-IDF = TF * IDF
-        });
-        return tfIdfScore;
-    }
+        // Créer le vecteur TF-IDF pour ce document
+        const tfIdfVector = {};
+        Object.keys(wordCount).forEach(word => {
+            const tf = wordCount[word] / words.length;
+            const idf = invertedIndex[word] ? invertedIndex[word].idf : Math.log(totalDocuments / (1 + 1)); // Smoothed IDF
+            const tfIdf = tf * idf;
 
-    // Calcul du TF-IDF pour le titre et le snippet
-    const results = searchResults.map(result => {
-        const titleTfIdf = calculateTfIdf(result.title, query);
-        const snippetTfIdf = calculateTfIdf(result.snippet, query);
+            tfIdfVector[word] = tfIdf;
+
+            // Ajouter à l'index inversé
+            if (!invertedIndex[word]) {
+                invertedIndex[word] = {
+                    documents: [],
+                    idf: 0
+                };
+            }
+            invertedIndex[word].documents.push({ docIndex, tfIdf });
+        });
+
+        // Stocker le vecteur TF-IDF
+        documentVectors[docIndex] = tfIdfVector;
+    });
+
+    // Mise à jour de l'IDF dans l'index inversé
+    Object.keys(invertedIndex).forEach(word => {
+        const docCount = invertedIndex[word].documents.length;
+        invertedIndex[word].idf = Math.log(totalDocuments / docCount);
+    });
+}
+
+// Fonction pour afficher les résultats avec la similarité cosinus
+function displayResultsWithCosineSimilarity(query, startTime) {
+    const resultsContainer = document.getElementById('results');
+    const loading = document.getElementById('loading');
+    const timeTakenElement = document.getElementById('timeTaken');
+
+    const queryWords = query.split(/\s+/);
+    const queryVector = createQueryVector(queryWords);
+
+    // Calculer la similarité cosinus pour chaque document
+    const results = Object.keys(documentVectors).map(docIndex => {
+        const docVector = documentVectors[docIndex];
+        const cosineSim = calculateCosineSimilarity(queryVector, docVector);
         return {
-            ...result,
-            score: titleTfIdf * 2 + snippetTfIdf // Donner plus de poids au titre
+            ...cachedSearchResults[docIndex],
+            score: cosineSim
         };
     }).filter(result => result.score > 0); // Garder les résultats pertinents
 
@@ -129,6 +136,38 @@ function displayResultsWithTfIdf(searchResults, query, startTime) {
 
     timeTakenElement.textContent = `Les résultats ont été affichés en ${timeTaken} secondes.`;
     timeTakenElement.style.display = 'block';
+}
+
+// Fonction pour créer un vecteur de requête TF-IDF
+function createQueryVector(queryWords) {
+    const queryVector = {};
+    queryWords.forEach(word => {
+        const idf = invertedIndex[word] ? invertedIndex[word].idf : Math.log(totalDocuments / 1); // Smoothed IDF
+        queryVector[word] = idf; // Assuming term frequency is 1 for query words
+    });
+    return queryVector;
+}
+
+// Fonction pour calculer la similarité cosinus
+function calculateCosineSimilarity(queryVector, docVector) {
+    let dotProduct = 0;
+    let queryMagnitude = 0;
+    let docMagnitude = 0;
+
+    Object.keys(queryVector).forEach(word => {
+        dotProduct += (queryVector[word] || 0) * (docVector[word] || 0);
+        queryMagnitude += Math.pow(queryVector[word] || 0, 2);
+        docMagnitude += Math.pow(docVector[word] || 0, 2);
+    });
+
+    queryMagnitude = Math.sqrt(queryMagnitude);
+    docMagnitude = Math.sqrt(docMagnitude);
+
+    if (queryMagnitude === 0 || docMagnitude === 0) {
+        return 0;
+    }
+
+    return dotProduct / (queryMagnitude * docMagnitude);
 }
 
 // Fonction pour surligner les termes de recherche dans les résultats
