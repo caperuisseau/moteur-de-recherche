@@ -68,7 +68,7 @@ function createInvertedIndex(documents) {
     });
 }
 
-// Display results based on query matching
+// Display results based on query matching with new features
 function displayResults(query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
@@ -77,21 +77,46 @@ function displayResults(query, startTime) {
     const queryWords = query.split(/\s+/);
     const relevantDocs = {};
 
+    // Exact Phrase Matching (if a phrase is wrapped in quotes)
+    const exactPhraseMatch = query.match(/"(.*?)"/);
+    const phrase = exactPhraseMatch ? exactPhraseMatch[1].toLowerCase() : null;
+
+    // Boosting logic
     queryWords.forEach(word => {
         if (invertedIndex[word]) {
             invertedIndex[word].forEach(docIndex => {
                 if (!relevantDocs[docIndex]) {
-                    relevantDocs[docIndex] = 0;
+                    relevantDocs[docIndex] = { score: 0, titleBoost: false };
                 }
-                relevantDocs[docIndex] += 1; // Simple relevance score based on word matches
+                const doc = cachedSearchResults[docIndex];
+                if (doc.title.toLowerCase().includes(word)) {
+                    relevantDocs[docIndex].score += 2; // Boost title matches
+                    relevantDocs[docIndex].titleBoost = true;
+                } else if (doc.snippet.toLowerCase().includes(word)) {
+                    relevantDocs[docIndex].score += 1; // Standard snippet match
+                }
             });
         }
     });
 
+    // Exact phrase matching logic
+    if (phrase) {
+        cachedSearchResults.forEach((doc, docIndex) => {
+            if (doc.title.toLowerCase().includes(phrase) || doc.snippet.toLowerCase().includes(phrase)) {
+                if (!relevantDocs[docIndex]) {
+                    relevantDocs[docIndex] = { score: 0, titleBoost: false };
+                }
+                relevantDocs[docIndex].score += 3; // Higher weight for exact phrase match
+            }
+        });
+    }
+
+    // Sort results by score
     const results = Object.keys(relevantDocs)
         .map(docIndex => ({
             ...cachedSearchResults[docIndex],
-            score: relevantDocs[docIndex]
+            score: relevantDocs[docIndex].score,
+            titleBoost: relevantDocs[docIndex].titleBoost
         }))
         .sort((a, b) => b.score - a.score); // Sort by relevance score
 
@@ -105,9 +130,13 @@ function displayResults(query, startTime) {
         results.forEach(result => {
             const resultElement = document.createElement('div');
             resultElement.classList.add('result');
+            const highlightTitle = highlightQuery(result.title, query);
+            const highlightSnippet = highlightQuery(result.snippet, query);
+            const boostLabel = result.titleBoost ? `<span class="boost"> (Title Boosted)</span>` : '';
+
             resultElement.innerHTML = `
-                <a href="${result.link}" target="_blank">${highlightQuery(result.title, query)}</a>
-                <p>${highlightQuery(result.snippet, query)}</p>
+                <a href="${result.link}" target="_blank">${highlightTitle}${boostLabel}</a>
+                <p>${highlightSnippet}</p>
             `;
             resultsContainer.appendChild(resultElement);
         });
