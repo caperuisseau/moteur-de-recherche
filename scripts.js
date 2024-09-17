@@ -1,5 +1,6 @@
 // Caching the search results globally to avoid multiple fetch calls
 let cachedSearchResults = null;
+let documentFrequency = {}; // For storing document frequency for each term
 
 // Fonction pour gérer la recherche
 function search(event) {
@@ -20,7 +21,7 @@ function search(event) {
 
     // Si les résultats sont déjà mis en cache, on les utilise
     if (cachedSearchResults) {
-        displayResults(cachedSearchResults, query, startTime);
+        displayResultsWithTfIdf(cachedSearchResults, query, startTime);
     } else {
         // Charger le fichier JSON
         fetch('sites.json')
@@ -32,7 +33,8 @@ function search(event) {
             })
             .then(searchResults => {
                 cachedSearchResults = searchResults; // Mise en cache
-                displayResults(searchResults, query, startTime);
+                calculateDocumentFrequency(searchResults); // Calcul de DF pour chaque terme
+                displayResultsWithTfIdf(searchResults, query, startTime);
             })
             .catch(error => {
                 console.error('Erreur lors du chargement des résultats :', error);
@@ -42,31 +44,63 @@ function search(event) {
     }
 }
 
-// Fonction pour afficher les résultats
-function displayResults(searchResults, query, startTime) {
+// Fonction pour calculer la fréquence des documents pour chaque terme
+function calculateDocumentFrequency(documents) {
+    documentFrequency = {}; // Réinitialiser les fréquences des documents
+    const totalDocuments = documents.length;
+
+    documents.forEach(document => {
+        const words = new Set([...document.title.toLowerCase().split(/\s+/), ...document.snippet.toLowerCase().split(/\s+/)]);
+        words.forEach(word => {
+            if (!documentFrequency[word]) {
+                documentFrequency[word] = 0;
+            }
+            documentFrequency[word] += 1; // Comptage du nombre de documents contenant ce mot
+        });
+    });
+
+    // Calcul de l'IDF pour chaque terme
+    for (let word in documentFrequency) {
+        documentFrequency[word] = Math.log(totalDocuments / documentFrequency[word]);
+    }
+}
+
+// Fonction pour afficher les résultats avec TF-IDF
+function displayResultsWithTfIdf(searchResults, query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
     const timeTakenElement = document.getElementById('timeTaken');
 
-    // Fonction pour vérifier les correspondances avec poids
-    function match(text, query) {
-        const words = query.split(/\s+/); // Diviser la requête en mots
-        let score = 0;
+    // Fonction pour calculer le score TF-IDF
+    function calculateTfIdf(text, query) {
+        const words = text.toLowerCase().split(/\s+/);
+        const wordCount = {}; // Fréquence des termes dans ce texte
+        const totalWords = words.length;
         words.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi'); // Match mot exact
-            const matches = (text.match(regex) || []).length;
-            score += matches;
+            if (!wordCount[word]) {
+                wordCount[word] = 0;
+            }
+            wordCount[word] += 1;
         });
-        return score;
+
+        // Calcul du score TF-IDF pour chaque terme de la requête
+        const queryWords = query.split(/\s+/);
+        let tfIdfScore = 0;
+        queryWords.forEach(queryWord => {
+            const tf = wordCount[queryWord] ? wordCount[queryWord] / totalWords : 0; // Term Frequency
+            const idf = documentFrequency[queryWord] || 0; // Inverse Document Frequency
+            tfIdfScore += tf * idf; // TF-IDF = TF * IDF
+        });
+        return tfIdfScore;
     }
 
-    // Filtrer et donner des scores
+    // Calcul du TF-IDF pour le titre et le snippet
     const results = searchResults.map(result => {
-        const titleScore = match(result.title.toLowerCase(), query);
-        const snippetScore = match(result.snippet.toLowerCase(), query);
+        const titleTfIdf = calculateTfIdf(result.title, query);
+        const snippetTfIdf = calculateTfIdf(result.snippet, query);
         return {
             ...result,
-            score: titleScore * 2 + snippetScore // Donner plus de poids au titre
+            score: titleTfIdf * 2 + snippetTfIdf // Donner plus de poids au titre
         };
     }).filter(result => result.score > 0); // Garder les résultats pertinents
 
