@@ -13,6 +13,7 @@
 
 <body>
     <div class="container">
+        <p>le moteur de recherche encontre des problème majeur et vous ne pouvez donc plus rechercher quoi que ce soit nous avons bloqué les recherches</p>
         <!-- Navigation bar with buttons -->
         <nav class="nav-buttons">
             <button onclick="window.location.href='https://newer-stream.netlify.app/';">Newer stream</button>
@@ -27,8 +28,8 @@
         </div>
 
         <form class="search-form" onsubmit="return search(event)">
-            <input type="text" id="query" name="q" placeholder="rechercher..." aria-label="Search" required>
-            <button type="submit">Recherche</button>
+            <input type="text" id="query" name="q" placeholder="BLOQUE" aria-label="Search" required disabled>
+            <button type="submit">impossible de rechercher</button>
         </form>
 
         <div id="results"></div>
