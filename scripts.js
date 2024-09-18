@@ -11,9 +11,10 @@ let cachedSearchResults = null;
 let invertedIndex = {};
 let totalDocuments = 0;
 
-// Fonction de gestion du formulaire de recherche
+// Fonction principale de gestion de la recherche
 function handleSearch(event) {
     event.preventDefault();
+    
     const query = document.getElementById('query').value.toLowerCase().trim();
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
@@ -25,18 +26,18 @@ function handleSearch(event) {
     }
 
     loading.style.display = 'block';
-    resultsContainer.innerHTML = '';
+    resultsContainer.innerHTML = ''; // Clear previous results
     const startTime = performance.now();
 
     if (cachedSearchResults) {
         displayResults(query, startTime);
     } else {
-        fetchResults(startTime, query);
+        fetchResults(query, startTime);
     }
 }
 
-// Fonction pour récupérer les résultats de recherche à partir du fichier JSON
-function fetchResults(startTime, query) {
+// Fonction pour récupérer les résultats depuis un fichier JSON
+function fetchResults(query, startTime) {
     fetch('sites.json')
         .then(response => {
             if (!response.ok) {
@@ -59,21 +60,23 @@ function fetchResults(startTime, query) {
 
 // Création d'un index inversé simple
 function createInvertedIndex(documents) {
-    invertedIndex = {};
+    invertedIndex = {}; // Clear previous index
 
     documents.forEach((doc, docIndex) => {
-        const words = [...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)];
+        const words = [...new Set([...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)])];
 
         words.forEach(word => {
-            if (!invertedIndex[word]) {
+            if (!invertedIndex.hasOwnProperty(word)) {
                 invertedIndex[word] = [];
             }
-            invertedIndex[word].push(docIndex);
+            if (Array.isArray(invertedIndex[word])) {
+                invertedIndex[word].push(docIndex);
+            }
         });
     });
 }
 
-// Afficher les résultats en fonction de la requête
+// Affichage des résultats de recherche
 function displayResults(query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
@@ -82,23 +85,25 @@ function displayResults(query, startTime) {
     const queryWords = query.split(/\s+/);
     const relevantDocs = {};
 
+    // Récupérer les documents pertinents pour chaque mot de la requête
     queryWords.forEach(word => {
         if (invertedIndex[word]) {
             invertedIndex[word].forEach(docIndex => {
                 if (!relevantDocs[docIndex]) {
                     relevantDocs[docIndex] = 0;
                 }
-                relevantDocs[docIndex] += 1; // Simple score de pertinence basé sur le nombre d'occurrences
+                relevantDocs[docIndex] += 1; // Compter les occurrences des mots de la requête
             });
         }
     });
 
+    // Trier les documents en fonction de la pertinence (nombre d'occurrences)
     const results = Object.keys(relevantDocs)
         .map(docIndex => ({
             ...cachedSearchResults[docIndex],
             score: relevantDocs[docIndex]
         }))
-        .sort((a, b) => b.score - a.score); // Trier par score de pertinence
+        .sort((a, b) => b.score - a.score);
 
     const endTime = performance.now();
     const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
