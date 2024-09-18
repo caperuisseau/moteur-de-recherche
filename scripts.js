@@ -1,5 +1,5 @@
 // Ce script est temporairement désactivé puisque la recherche est "bloquée" dans l'interface HTML.
-
+console.info('ce site est en version en cour de developpement')
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.querySelector('.search-form');
     const searchInput = document.getElementById('query');
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchForm) {
         // Vérifie si l'input est désactivé
         if (searchInput.disabled) {
-            console.warn('la première recherche prendra du temps cela est un prblème qui sera réglé dans quelques temps');
+            console.info('la première recherche prendra du temps cela est un prblème qui sera réglé dans quelques temps');
             return; // Ne fait rien car la recherche est désactivée
         }
         
@@ -32,6 +32,7 @@ function search(event) {
 
     if (!query) {
         resultsContainer.innerHTML = '<p>Veuillez entrer un terme de recherche.</p>';
+        console.warn('Veuillez entrer un terme de recherche.')
         return;
     }
 
@@ -52,6 +53,7 @@ function fetchResults(query, startTime) {
         .then(response => {
             if (!response.ok) {
                 throw new Error('Erreur réseau.');
+                console.warn('Verifiez votre réseau')
             }
             return response.json();
         })
