@@ -1,13 +1,14 @@
-// Ce script est temporairement désactivé puisque la recherche est "bloquée" dans l'interface HTML.
-console.info('ce site est en version en cour de developpement')
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.querySelector('.search-form');
     const searchInput = document.getElementById('query');
     
+    // Charger les résultats dès que la page est prête
+    preloadSearchResults();
+
     if (searchForm) {
         // Vérifie si l'input est désactivé
         if (searchInput.disabled) {
-            console.info('la première recherche prendra du temps cela est un prblème qui sera réglé dans quelques temps');
+            console.warn('La recherche est actuellement bloquée.');
             return; // Ne fait rien car la recherche est désactivée
         }
         
@@ -21,6 +22,26 @@ let cachedSearchResults = null;
 let invertedIndex = {};
 let totalDocuments = 0;
 
+// Précharger les résultats au chargement de la page
+function preloadSearchResults() {
+    fetch('sites.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur réseau.');
+            }
+            return response.json();
+        })
+        .then(searchResults => {
+            cachedSearchResults = searchResults; // Stocker les résultats
+            totalDocuments = searchResults.length;
+            createInvertedIndex(searchResults); // Créer l'index inversé immédiatement
+            console.log('Données préchargées et index créé. Prêt pour la recherche.');
+        })
+        .catch(error => {
+            console.error('Erreur lors du préchargement des résultats:', error);
+        });
+}
+
 // Fonction principale de gestion de la recherche
 function search(event) {
     event.preventDefault();
@@ -32,47 +53,20 @@ function search(event) {
 
     if (!query) {
         resultsContainer.innerHTML = '<p>Veuillez entrer un terme de recherche.</p>';
-        console.warn('Veuillez entrer un terme de recherche.')
         return;
     }
 
     loading.style.display = 'block';
-    resultsContainer.innerHTML = ''; // Clear previous results
+    resultsContainer.innerHTML = ''; // Effacer les résultats précédents
     const startTime = performance.now();
 
-    if (cachedSearchResults) {
-        displayResults(query, startTime);
-    } else {
-        fetchResults(query, startTime);
-    }
-}
-
-// Fonction pour récupérer les résultats depuis un fichier JSON
-function fetchResults(query, startTime) {
-    fetch('sites.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur réseau.');
-                console.warn('Verifiez votre réseau')
-            }
-            return response.json();
-        })
-        .then(searchResults => {
-            cachedSearchResults = searchResults;
-            totalDocuments = searchResults.length;
-            createInvertedIndex(searchResults);
-            displayResults(query, startTime);
-        })
-        .catch(error => {
-            console.error('Erreur lors du chargement des résultats:', error);
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('results').innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
-        });
+    // Les résultats sont déjà en cache grâce au préchargement
+    displayResults(query, startTime);
 }
 
 // Création d'un index inversé simple
 function createInvertedIndex(documents) {
-    invertedIndex = {}; // Clear previous index
+    invertedIndex = {}; // Réinitialiser l'index précédent
 
     documents.forEach((doc, docIndex) => {
         const words = [...new Set([...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)])];
