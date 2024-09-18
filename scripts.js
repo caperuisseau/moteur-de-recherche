@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchForm) {
         // Vérifie si l'input est désactivé
         if (searchInput.disabled) {
-            console.warn('La recherche est actuellement bloquée.');
+            console.warn('la première recherche prendra du temps cela est un prblème qui sera réglé dans quelques temps');
             return; // Ne fait rien car la recherche est désactivée
         }
         
