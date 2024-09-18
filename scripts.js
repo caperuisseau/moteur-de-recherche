@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.getElementById('searchForm');
     if (searchForm) {
-        searchForm.addEventListener('submit', search);
+        searchForm.addEventListener('submit', handleSearch);
     } else {
         console.error('Search form not found.');
     }
@@ -11,8 +11,8 @@ let cachedSearchResults = null;
 let invertedIndex = {};
 let totalDocuments = 0;
 
-// Search function
-function search(event) {
+// Fonction de gestion du formulaire de recherche
+function handleSearch(event) {
     event.preventDefault();
     const query = document.getElementById('query').value.toLowerCase().trim();
     const resultsContainer = document.getElementById('results');
@@ -31,28 +31,33 @@ function search(event) {
     if (cachedSearchResults) {
         displayResults(query, startTime);
     } else {
-        fetch('sites.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau.');
-                }
-                return response.json();
-            })
-            .then(searchResults => {
-                cachedSearchResults = searchResults;
-                totalDocuments = searchResults.length;
-                createInvertedIndex(searchResults);
-                displayResults(query, startTime);
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement des résultats:', error);
-                loading.style.display = 'none';
-                resultsContainer.innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
-            });
+        fetchResults(startTime, query);
     }
 }
 
-// Create a very simple inverted index
+// Fonction pour récupérer les résultats de recherche à partir du fichier JSON
+function fetchResults(startTime, query) {
+    fetch('sites.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur réseau.');
+            }
+            return response.json();
+        })
+        .then(searchResults => {
+            cachedSearchResults = searchResults;
+            totalDocuments = searchResults.length;
+            createInvertedIndex(searchResults);
+            displayResults(query, startTime);
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement des résultats:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results').innerHTML = '<p>Erreur lors du chargement des résultats.</p>';
+        });
+}
+
+// Création d'un index inversé simple
 function createInvertedIndex(documents) {
     invertedIndex = {};
 
@@ -68,7 +73,7 @@ function createInvertedIndex(documents) {
     });
 }
 
-// Display results based on query matching
+// Afficher les résultats en fonction de la requête
 function displayResults(query, startTime) {
     const resultsContainer = document.getElementById('results');
     const loading = document.getElementById('loading');
@@ -83,7 +88,7 @@ function displayResults(query, startTime) {
                 if (!relevantDocs[docIndex]) {
                     relevantDocs[docIndex] = 0;
                 }
-                relevantDocs[docIndex] += 1; // Simple relevance score based on word matches
+                relevantDocs[docIndex] += 1; // Simple score de pertinence basé sur le nombre d'occurrences
             });
         }
     });
@@ -93,7 +98,7 @@ function displayResults(query, startTime) {
             ...cachedSearchResults[docIndex],
             score: relevantDocs[docIndex]
         }))
-        .sort((a, b) => b.score - a.score); // Sort by relevance score
+        .sort((a, b) => b.score - a.score); // Trier par score de pertinence
 
     const endTime = performance.now();
     const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
@@ -119,7 +124,7 @@ function displayResults(query, startTime) {
     timeTakenElement.style.display = 'block';
 }
 
-// Function to highlight query terms in the results
+// Fonction pour surligner les termes de la requête dans les résultats
 function highlightQuery(text, query) {
     const words = query.split(/\s+/);
     const regex = new RegExp(`(${words.join('|')})`, 'gi');
