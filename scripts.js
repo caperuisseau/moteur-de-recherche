@@ -1,9 +1,19 @@
+// Ce script est temporairement désactivé puisque la recherche est "bloquée" dans l'interface HTML.
+
 document.addEventListener('DOMContentLoaded', () => {
-    const searchForm = document.getElementById('searchForm');
+    const searchForm = document.querySelector('.search-form');
+    const searchInput = document.getElementById('query');
+    
     if (searchForm) {
-        searchForm.addEventListener('submit', handleSearch);
+        // Vérifie si l'input est désactivé
+        if (searchInput.disabled) {
+            console.warn('La recherche est actuellement bloquée.');
+            return; // Ne fait rien car la recherche est désactivée
+        }
+        
+        searchForm.addEventListener('submit', search);
     } else {
-        console.error('Search form not found.');
+        console.error('Le formulaire de recherche est introuvable.');
     }
 });
 
@@ -12,7 +22,7 @@ let invertedIndex = {};
 let totalDocuments = 0;
 
 // Fonction principale de gestion de la recherche
-function handleSearch(event) {
+function search(event) {
     event.preventDefault();
     
     const query = document.getElementById('query').value.toLowerCase().trim();
