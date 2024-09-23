@@ -82,22 +82,19 @@ function displayResults(query, startTime) {
 
     // Rechercher les documents correspondant à la requête
     queryWords.forEach(word => {
-        const regex = new RegExp(word, 'i'); // Correspondance insensible à la casse
-        Object.keys(invertedIndex).forEach(indexWord => {
-            if (regex.test(indexWord)) {
-                invertedIndex[indexWord].forEach(docIndex => {
-                    if (!relevantDocs[docIndex]) {
-                        relevantDocs[docIndex] = 0;
-                    }
-                    relevantDocs[docIndex] += 1;
-                });
-            }
-        });
+        if (invertedIndex[word]) {
+            invertedIndex[word].forEach(docIndex => {
+                if (!relevantDocs[docIndex]) {
+                    relevantDocs[docIndex] = 0;
+                }
+                relevantDocs[docIndex] += 1; // Compter les occurrences
+            });
+        }
     });
 
     // Filtrer les résultats pour ne garder que ceux qui contiennent tous les mots
     const results = Object.keys(relevantDocs)
-        .filter(docIndex => relevantDocs[docIndex] === queryWords.length)
+        .filter(docIndex => relevantDocs[docIndex] === queryWords.length) // Tous les mots doivent être présents
         .map(docIndex => ({
             ...cachedSearchResults[docIndex],
             score: relevantDocs[docIndex]
