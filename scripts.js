@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('query');
-    
+
     // Charger immédiatement le fichier JSON au chargement de la page
     preloadSearchResults();
 
@@ -14,7 +14,7 @@ let cachedSearchResults = null;
 let invertedIndex = {};
 let totalDocuments = 0;
 
-// Précharger les résultats de 'sites.json' dès que la page est chargée
+// Précharger les résultats de 'sites.json'
 function preloadSearchResults() {
     fetch('sites.json')
         .then(response => {
@@ -24,9 +24,9 @@ function preloadSearchResults() {
             return response.json();
         })
         .then(searchResults => {
-            cachedSearchResults = searchResults; // Mettre en cache les résultats
+            cachedSearchResults = searchResults;
             totalDocuments = searchResults.length;
-            createInvertedIndex(searchResults); // Créer un index inversé
+            createInvertedIndex(searchResults);
             console.log('Données préchargées. Les recherches seront instantanées.');
         })
         .catch(error => {
@@ -34,9 +34,9 @@ function preloadSearchResults() {
         });
 }
 
-// Création d'un index inversé pour faciliter la recherche
+// Création d'un index inversé
 function createInvertedIndex(documents) {
-    invertedIndex = {}; // Initialiser l'index
+    invertedIndex = {};
 
     documents.forEach((doc, docIndex) => {
         const words = [...new Set([...doc.title.toLowerCase().split(/\s+/), ...doc.snippet.toLowerCase().split(/\s+/)])];
@@ -45,12 +45,12 @@ function createInvertedIndex(documents) {
             if (!invertedIndex[word]) {
                 invertedIndex[word] = [];
             }
-            invertedIndex[word].push(docIndex); // Associer le mot à l'index du document
+            invertedIndex[word].push(docIndex);
         });
     });
 }
 
-// Cette fonction est prête pour des futures recherches lorsque le champ sera débloqué
+// Fonction de recherche
 function search(event) {
     event.preventDefault();
 
@@ -65,10 +65,10 @@ function search(event) {
     }
 
     loading.style.display = 'block';
-    resultsContainer.innerHTML = ''; // Effacer les résultats précédents
+    resultsContainer.innerHTML = '';
     const startTime = performance.now();
 
-    displayResults(query, startTime); // Afficher les résultats immédiatement
+    displayResults(query, startTime);
 }
 
 // Afficher les résultats de la recherche
@@ -82,18 +82,22 @@ function displayResults(query, startTime) {
 
     // Rechercher les documents correspondant à la requête
     queryWords.forEach(word => {
-        if (invertedIndex[word]) {
-            invertedIndex[word].forEach(docIndex => {
-                if (!relevantDocs[docIndex]) {
-                    relevantDocs[docIndex] = 0;
-                }
-                relevantDocs[docIndex] += 1; // Compter les occurrences
-            });
-        }
+        const regex = new RegExp(word, 'i'); // Correspondance insensible à la casse
+        Object.keys(invertedIndex).forEach(indexWord => {
+            if (regex.test(indexWord)) {
+                invertedIndex[indexWord].forEach(docIndex => {
+                    if (!relevantDocs[docIndex]) {
+                        relevantDocs[docIndex] = 0;
+                    }
+                    relevantDocs[docIndex] += 1;
+                });
+            }
+        });
     });
 
-    // Trier les résultats par pertinence
+    // Filtrer les résultats pour ne garder que ceux qui contiennent tous les mots
     const results = Object.keys(relevantDocs)
+        .filter(docIndex => relevantDocs[docIndex] === queryWords.length)
         .map(docIndex => ({
             ...cachedSearchResults[docIndex],
             score: relevantDocs[docIndex]
@@ -117,16 +121,31 @@ function displayResults(query, startTime) {
             resultsContainer.appendChild(resultElement);
         });
     } else {
-        resultsContainer.innerHTML = '<p>Aucun résultat trouvé.</p>';
+        resultsContainer.innerHTML = `<p>Aucun résultat trouvé pour "${query}".</p>`;
+        suggestSimilarQueries(query);
     }
 
     timeTakenElement.textContent = `Résultats affichés en ${timeTaken} secondes.`;
     timeTakenElement.style.display = 'block';
 }
 
-// Fonction pour surligner les termes recherchés dans les résultats
+// Fonction pour surligner les termes recherchés
 function highlightQuery(text, query) {
     const words = query.split(/\s+/);
     const regex = new RegExp(`(${words.join('|')})`, 'gi');
     return text.replace(regex, '<mark>$1</mark>');
+}
+
+// Suggérer des requêtes similaires
+function suggestSimilarQueries(query) {
+    const suggestions = Object.keys(invertedIndex)
+        .filter(word => word.startsWith(query))
+        .slice(0, 5) // Limiter le nombre de suggestions
+        .join(', ');
+
+    if (suggestions) {
+        const suggestionsElement = document.createElement('p');
+        suggestionsElement.innerHTML = `Suggestions : ${suggestions}.`;
+        document.getElementById('results').appendChild(suggestionsElement);
+    }
 }
